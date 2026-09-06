@@ -4,6 +4,9 @@ import type {Express} from 'express';
 import { sql } from "drizzle-orm";
 import { db } from '../db/index.js';
 
+import authRouter from './auth/auth.routes.js';
+import { errorHandler } from '../common/errors/ErrorHandler.js';
+
 
 
 export function createApplication():Express{
@@ -12,9 +15,14 @@ export function createApplication():Express{
 
 
     //middlewars
-
+    app.use(express.json());
+    
 
     //routes
+   app.use("/auth", authRouter);
+
+
+   
 
     app.get("/health", async (req, res) => {
     try {
@@ -34,6 +42,8 @@ export function createApplication():Express{
         });
     }
 });
+
+    app.use(errorHandler)
 
     return app;
 
