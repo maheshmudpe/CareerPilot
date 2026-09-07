@@ -1,8 +1,8 @@
 import type { Request , Response } from "express";
 
-import { registerSchema } from "./auth.schema.js";
+import { registerSchema , loginSchema } from "./auth.schema.js";
 
-import { registerUser } from "./auth.service.js";
+import { registerUser, loginService } from "./auth.service.js";
 
 
 export const registerController = async  (req:Request , res:Response) => {
@@ -22,6 +22,29 @@ export const registerController = async  (req:Request , res:Response) => {
 
    return res.status(201).json(user);
   
+}
+
+
+export const loginController = async(req:Request, res:Response) => {
+
+
+    const result = loginSchema.safeParse(req.body)
+
+    if(!result.success){
+
+        return res.status(400).json({
+
+            message:"please enter in correct format"
+
+        })
+
+    }
+
+    const user = await loginService(result.data)
+
+    return res.status(200).json(user)
+    
+
 }
 
 
