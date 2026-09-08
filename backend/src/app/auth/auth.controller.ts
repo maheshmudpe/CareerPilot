@@ -48,3 +48,11 @@ export const loginController = async(req:Request, res:Response) => {
 }
 
 
+export const meController = async (req: Request, res: Response) => {
+    return res.status(200).json({
+        userId: req.user?.id
+    });
+    
+};
+
+
