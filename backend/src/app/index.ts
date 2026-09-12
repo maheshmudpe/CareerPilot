@@ -6,6 +6,7 @@ import { db } from '../db/index.js';
 
 import authRouter from './auth/auth.routes.js';
 import { errorHandler } from '../common/errors/ErrorHandler.js';
+import profileRouter from './profile/profile.routes.js';
 
 
 
@@ -20,6 +21,7 @@ export function createApplication():Express{
 
     //routes
    app.use("/auth", authRouter);
+   app.use('/profile' , profileRouter)
 
 
    
