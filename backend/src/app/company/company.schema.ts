@@ -1,0 +1,32 @@
+import { z } from "zod";
+
+export const createCompanySchema = z.object({
+    name: z.string().trim().min(1),
+    website: z.url().optional(),
+    location: z.string().optional(),
+    industry: z.string().optional(),
+    notes: z.string().optional(),
+});
+
+export const updateCompanySchema = z.object({
+    name: z.string().trim().min(1).optional(),
+    website: z.url().optional(),
+    location: z.string().optional(),
+    industry: z.string().optional(),
+    notes: z.string().optional(),
+}).refine(
+    (data) => Object.keys(data).length > 0,
+    {
+        message: "At least one field is required",
+    }
+);
+
+export const companyIdSchema = z.object({
+    id: z.uuid(),
+});
+
+export type CreateCompanyPayload = z.infer<typeof createCompanySchema>;
+
+export type UpdateCompanyPayload = z.infer<typeof updateCompanySchema>;
+
+export type CompanyIdParams = z.infer<typeof companyIdSchema>;
