@@ -36,18 +36,7 @@ export const createApplicationSchema = z.object({
     notes: z.string().optional(),
 });
 
-export type CreateApplicationPayload = z.infer<
-    typeof createApplicationSchema
->;
 
-
-export const applicationIdSchema = z.object({
-    id: z.uuid(),
-});
-
-export type ApplicationIdParams = z.infer<
-    typeof applicationIdSchema
->;
 
 
 export const updateApplicationSchema = z.object({
@@ -91,17 +80,70 @@ export const updateApplicationSchema = z.object({
     }
 );
 
+
+
+export const applicationQuerySchema = z.object({
+    search: z.string().trim().optional(),
+
+    status: z.enum([
+        "SAVED",
+        "APPLIED",
+        "SCREENING",
+        "INTERVIEW",
+        "OFFER",
+        "ACCEPTED",
+        "REJECTED",
+        "WITHDRAWN",
+    ]).optional(),
+
+    companyId: z.uuid().optional(),
+
+    page: z.coerce
+        .number()
+        .int()
+        .min(1)
+        .default(1),
+
+    limit: z.coerce
+        .number()
+        .int()
+        .min(1)
+        .max(100)
+        .default(10),
+
+    sortBy: z.enum([
+        "createdAt",
+        "updatedAt",
+        "appliedAt",
+        "jobTitle",
+    ]).default("createdAt"),
+
+    sortOrder: z.enum([
+        "asc",
+        "desc",
+    ]).default("desc"),
+});
+
+
+
+export type ApplicationQuery = z.infer<
+    typeof applicationQuerySchema
+>;
+
+
 export type UpdateApplicationPayload = z.infer<
     typeof updateApplicationSchema
 >;
 
+export type CreateApplicationPayload = z.infer<
+    typeof createApplicationSchema
+>;
 
-export const applicationQuerySchema = z.object({
-    page: z.coerce.number().int().min(1).default(1),
 
-    limit: z.coerce.number().int().min(1).max(100).default(10),
+export const applicationIdSchema = z.object({
+    id: z.uuid(),
 });
 
-export type ApplicationQuery = z.infer<
-    typeof applicationQuerySchema
+export type ApplicationIdParams = z.infer<
+    typeof applicationIdSchema
 >;

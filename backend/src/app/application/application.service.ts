@@ -1,4 +1,4 @@
-import { and, eq, count, desc } from "drizzle-orm";
+import { and, eq, count, desc, asc, ilike } from "drizzle-orm";
 
 import { db } from "../../db/index.js";
 import { companiesTable, applicationsTable } from "../../db/schema.js";
@@ -57,30 +57,69 @@ export const getApplicationsService = async (
     userId: string,
     query: ApplicationQuery
 ) => {
+    const conditions = [
+        eq(applicationsTable.userId, userId),
+    ];
+
+    // Filter by status
+    if (query.status) {
+        conditions.push(
+            eq(applicationsTable.status, query.status)
+        );
+    }
+
+    // Filter by company
+    if (query.companyId) {
+        conditions.push(
+            eq(applicationsTable.companyId, query.companyId)
+        );
+    }
+
+    // Search by job title
+    if (query.search) {
+        conditions.push(
+            ilike(
+                applicationsTable.jobTitle,
+                `%${query.search}%`
+            )
+        );
+    }
+
+    // Pagination
     const offset = (query.page - 1) * query.limit;
+
+    // Sorting
+    const sortColumn = {
+        createdAt: applicationsTable.createdAt,
+        updatedAt: applicationsTable.updatedAt,
+        appliedAt: applicationsTable.appliedAt,
+        jobTitle: applicationsTable.jobTitle,
+    }[query.sortBy];
+
+    const order =
+        query.sortOrder === "asc"
+            ? asc(sortColumn)
+            : desc(sortColumn);
 
     const applications = await db
         .select()
         .from(applicationsTable)
-        .where(
-            eq(applicationsTable.userId, userId)
-        )
-        .orderBy(
-            desc(applicationsTable.createdAt)
-        )
+        .where(and(...conditions))
+        .orderBy(order)
         .limit(query.limit)
         .offset(offset);
 
+    // Total matching records
     const [countResult] = await db
         .select({
             count: count(),
         })
         .from(applicationsTable)
-        .where(
-            eq(applicationsTable.userId, userId)
-        );
+        .where(and(...conditions));
 
-    const total = Number(countResult?.count ?? 0);
+    const total = Number(
+        countResult?.count ?? 0
+    );
 
     const totalPages = Math.ceil(
         total / query.limit
