@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, ilike, count, desc } from "drizzle-orm";
 import { db } from "../../db/index.js";
 import {
     companiesTable,
@@ -12,6 +12,7 @@ import {
 import type {
     CreateCompanyPayload,
     UpdateCompanyPayload,
+    CompanyQuery,
 } from "./company.schema.js";
 
 
@@ -54,12 +55,66 @@ export const createCompanyService = async (
 
 
 export const getCompaniesService = async (
-    userId: string
+    userId: string,
+    query: CompanyQuery
 ) => {
-    return await db
+    const conditions = [
+        eq(companiesTable.userId, userId),
+    ];
+
+    if (query.location) {
+        conditions.push(
+            eq(companiesTable.location, query.location)
+        );
+    }
+
+    if (query.industry) {
+        conditions.push(
+            eq(companiesTable.industry, query.industry)
+        );
+    }
+
+    if (query.search) {
+        conditions.push(
+            ilike(
+                companiesTable.name,
+                `%${query.search}%`
+            )
+        );
+    }
+
+    const offset = (query.page - 1) * query.limit;
+
+    const companies = await db
         .select()
         .from(companiesTable)
-        .where(eq(companiesTable.userId, userId));
+        .where(and(...conditions))
+        .orderBy(desc(companiesTable.createdAt))
+        .limit(query.limit)
+        .offset(offset);
+
+    const [countResult] = await db
+        .select({
+            count: count(),
+        })
+        .from(companiesTable)
+        .where(and(...conditions));
+
+    const total = Number(countResult?.count ?? 0);
+
+    const totalPages = Math.ceil(
+        total / query.limit
+    );
+
+    return {
+        companies,
+        pagination: {
+            page: query.page,
+            limit: query.limit,
+            total,
+            totalPages,
+        },
+    };
 };
 
 

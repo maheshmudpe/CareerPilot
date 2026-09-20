@@ -3,15 +3,16 @@ import type { Request, Response } from "express";
 import {
     createCompanyService,
     getCompaniesService,
-    getCompanyService,
     updateCompanyService,
     deleteCompanyService,
+    getCompanyService,
 } from "./company.service.js";
 
 import {
     createCompanySchema,
     updateCompanySchema,
     companyIdSchema,
+    companyQuerySchema,
 } from "./company.schema.js";
 
 
@@ -39,18 +40,30 @@ export const createCompanyController = async (
 };
 
 
+
 export const getCompaniesController = async (
     req: Request,
     res: Response
 ) => {
     const userId = req.user!.id;
 
-    const companies = await getCompaniesService(userId);
+    const result = companyQuerySchema.safeParse(req.query);
 
-    return res.status(200).json({
-        companies,
-    });
+    if (!result.success) {
+        return res.status(400).json({
+            message: "Invalid company query",
+            errors: result.error.issues,
+        });
+    }
+
+    const resultData = await getCompaniesService(
+        userId,
+        result.data
+    );
+
+    return res.status(200).json(resultData);
 };
+
 
 export const getCompanyController = async (
     req: Request,

@@ -25,6 +25,19 @@ export const companyIdSchema = z.object({
     id: z.uuid(),
 });
 
+
+export const companyQuerySchema = z.object({
+    search: z.string().trim().optional(),
+    location: z.string().trim().optional(),
+    industry: z.string().trim().optional(),
+
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).max(100).default(10),
+});
+
+
+export type CompanyQuery = z.infer<typeof companyQuerySchema>;
+
 export type CreateCompanyPayload = z.infer<typeof createCompanySchema>;
 
 export type UpdateCompanyPayload = z.infer<typeof updateCompanySchema>;
