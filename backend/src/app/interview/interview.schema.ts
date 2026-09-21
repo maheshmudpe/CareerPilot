@@ -48,6 +48,33 @@ export const updateInterviewSchema = z.object({
 );
 
 
+export const interviewQuerySchema = z.object({
+    status: z.enum([
+        "SCHEDULED",
+        "COMPLETED",
+        "CANCELLED",
+        "RESCHEDULED",
+    ]).optional(),
+
+    applicationId: z.uuid().optional(),
+
+    sortBy: z.enum([
+        "scheduledAt",
+        "createdAt",
+    ]).default("scheduledAt"),
+
+    sortOrder: z.enum([
+        "asc",
+        "desc",
+    ]).default("asc"),
+});
+
+
+export type InterviewQuery = z.infer<
+    typeof interviewQuerySchema
+>;
+
+
 export type UpdateInterviewPayload = z.infer<
     typeof updateInterviewSchema
 >;
