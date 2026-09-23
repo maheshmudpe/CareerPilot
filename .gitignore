@@ -17,3 +17,6 @@ coverage/
 # System / IDE files
 .DS_Store
 .vscode/
+
+
+backend/uploads/
