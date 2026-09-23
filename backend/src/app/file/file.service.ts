@@ -1,4 +1,7 @@
 import path from "node:path";
+import fs from "node:fs/promises";
+import crypto from "node:crypto";
+
 import { and, eq } from "drizzle-orm";
 
 import { db } from "../../db/index.js";
@@ -7,11 +10,12 @@ import {
     filesTable,
 } from "../../db/schema.js";
 
+import { env } from "../../config/env.js";
+import { supabase } from "../../common/storage/supabase.js";
 import { NotFoundError } from "../../common/errors/HttpErrors.js";
-import fs from "node:fs/promises";
-import type {
-    UploadFilePayload,
-} from "./file.schema.js";
+
+import type { UploadFilePayload } from "./file.schema.js";
+
 
 const allowedMimeTypes = new Set([
     "application/pdf",
@@ -23,9 +27,8 @@ const allowedExtensions = new Set([
     ".docx",
 ]);
 
-const deleteUploadedFile = async (
-    filePath: string
-) => {
+
+const deleteUploadedFile = async (filePath: string) => {
     try {
         await fs.unlink(filePath);
     } catch {
@@ -34,10 +37,21 @@ const deleteUploadedFile = async (
 };
 
 
+const deleteSupabaseFile = async (storageKey: string) => {
+    try {
+        await supabase.storage
+            .from(env.SUPABASE_BUCKET)
+            .remove([storageKey]);
+    } catch {
+        // Best-effort cleanup.
+    }
+};
+
 
 export const validateUploadedFile = (
     file: Express.Multer.File
 ) => {
+
     const extension = path
         .extname(file.originalname)
         .toLowerCase();
@@ -61,11 +75,16 @@ export const validateUploadedFile = (
     };
 };
 
+
 export const createFileService = async (
     userId: string,
     file: Express.Multer.File,
     payload: UploadFilePayload
 ) => {
+
+    /*
+     * 1. Verify application ownership
+     */
 
     if (payload.applicationId) {
 
@@ -97,28 +116,107 @@ export const createFileService = async (
     }
 
 
-    try {
-           const [createdFile] = await db
-        .insert(filesTable)
-        .values({
-            userId,
-            applicationId: payload.applicationId,
-            fileName: file.originalname,
-            storageKey: file.filename,
-            mimeType: file.mimetype,
-            fileSize: file.size,
-            fileType: payload.fileType,
-        })
-        .returning();
+    /*
+     * 2. Generate unique Supabase storage path
+     */
 
-    return createdFile;
-        
+    const extension = path
+        .extname(file.originalname)
+        .toLowerCase();
+
+    const uniqueName = `${crypto.randomUUID()}${extension}`;
+
+    const folder = payload.applicationId
+        ? `${userId}/${payload.applicationId}`
+        : `${userId}/general`;
+
+    const storageKey = `${folder}/${uniqueName}`;
+
+    let cloudUploadCompleted = false;
+
+
+    try {
+
+        /*
+         * 3. Read temporary local file
+         */
+
+        const fileBuffer = await fs.readFile(
+            file.path
+        );
+
+
+        /*
+         * 4. Upload file to Supabase Storage
+         */
+
+        const { error: uploadError } =
+            await supabase.storage
+                .from(env.SUPABASE_BUCKET)
+                .upload(
+                    storageKey,
+                    fileBuffer,
+                    {
+                        contentType: file.mimetype,
+                        upsert: false,
+                    }
+                );
+
+        if (uploadError) {
+            throw new Error(
+                "Failed to upload file"
+            );
+        }
+
+        cloudUploadCompleted = true;
+
+
+        /*
+         * 5. Store metadata in PostgreSQL
+         */
+
+        const [createdFile] = await db
+            .insert(filesTable)
+            .values({
+                userId,
+                applicationId: payload.applicationId,
+                fileName: file.originalname,
+                storageKey,
+                mimeType: file.mimetype,
+                fileSize: file.size,
+                fileType: payload.fileType,
+            })
+            .returning();
+
+
+        /*
+         * 6. Remove temporary local file
+         */
+
+        await deleteUploadedFile(file.path);
+
+
+        return createdFile;
+
     } catch (error) {
 
-         await deleteUploadedFile(file.path);
+        /*
+         * 7. Cleanup local temporary file
+         */
 
-         throw error;
-        
+        await deleteUploadedFile(file.path);
+
+
+        /*
+         * 8. Cleanup Supabase object
+         * if it was successfully uploaded
+         */
+
+        if (cloudUploadCompleted) {
+            await deleteSupabaseFile(storageKey);
+        }
+
+
+        throw error;
     }
- 
 };

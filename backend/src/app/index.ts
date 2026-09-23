@@ -13,7 +13,6 @@ import interviewRouter from './interview/interview.routes.js';
 import fileRouter from './file/file.routes.js';
 
 
-
 export function createApplication():Express{
 
     const app = express()
@@ -31,8 +30,6 @@ export function createApplication():Express{
    app.use("/interviews", interviewRouter);
    app.use("/files", fileRouter);
 
-
-   
 
     app.get("/health", async (req, res) => {
     try {
