@@ -3,7 +3,8 @@ import AppLayout from "../components/layout/AppLayout";
 
 import Login from "../app/auth/pages/Login";
 import Register from "../app/auth/pages/Register";
-import Dashboard from "../pages/Dashboard";
+import DashboardPage from "../app/dashboard/pages/DashboardPage";
+
 import Applications from "../pages/Applications";
 import ApplicationDetails from "../pages/ApplicationDetails";
 import Companies from "../pages/Companies";
@@ -19,18 +20,22 @@ export function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* Application routes */}
-     <Route element={<ProtectedRoute />}>
+      {/* Protected application routes */}
+      <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+
           <Route path="/applications" element={<Applications />} />
-          <Route path="/applications/:id" element={<ApplicationDetails />} />
+          <Route
+            path="/applications/:id"
+            element={<ApplicationDetails />}
+          />
           <Route path="/companies" element={<Companies />} />
           <Route path="/interviews" element={<Interviews />} />
           <Route path="/profile" element={<Profile />} />
         </Route>
-</Route>
+      </Route>
     </Routes>
   );
 }

@@ -1,4 +1,4 @@
-import { and, count, desc, eq, sql } from "drizzle-orm";
+import { and, count, desc, eq, sql, inArray, } from "drizzle-orm";
 
 import { db } from "../../db/index.js";
 
@@ -144,7 +144,10 @@ export const getDashboard = async (
     .where(
       and(
         eq(applicationsTable.userId, userId),
-        eq(interviewsTable.status, "SCHEDULED"),
+        inArray(interviewsTable.status, [
+          "SCHEDULED",
+          "RESCHEDULED",
+        ]),
         sql`${interviewsTable.scheduledAt} > NOW()`,
       ),
     )
