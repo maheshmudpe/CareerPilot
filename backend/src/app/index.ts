@@ -4,6 +4,8 @@ import type {Express} from 'express';
 import { sql } from "drizzle-orm";
 import { db } from '../db/index.js';
 
+import cors from "cors";
+
 import authRouter from './auth/auth.routes.js';
 import { errorHandler } from '../common/errors/ErrorHandler.js';
 import profileRouter from './profile/profile.routes.js';
@@ -18,8 +20,21 @@ export function createApplication():Express{
     const app = express()
 
 
+    //cors
+
+
+        
+    app.use(
+    cors({
+        origin: "http://localhost:5173",
+    }),
+    );
+
+
     //middlewars
     app.use(express.json());
+
+
     
 
     //routes

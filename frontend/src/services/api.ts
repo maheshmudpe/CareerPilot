@@ -1,20 +1,30 @@
-const API_URL = import.meta.env.VITE_API_URL;
+import axios from "axios";
 
-export const api = async <T>(
-  endpoint: string,
-  options?: RequestInit,
-): Promise<T> => {
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      "Content-Type": "application/json",
-      ...options?.headers,
-    },
-  });
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
-  if (!response.ok) {
-    throw new Error(`API request failed: ${response.status}`);
+api.interceptors.request.use((config) => {
+  const storedAuth = localStorage.getItem("careerpilot_auth");
+
+  if (storedAuth) {
+    try {
+      const { token } = JSON.parse(storedAuth) as {
+        token: string;
+      };
+
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch {
+      localStorage.removeItem("careerpilot_auth");
+    }
   }
 
-  return response.json();
-};
+  return config;
+});
+
+export default api;
