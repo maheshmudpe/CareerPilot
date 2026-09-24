@@ -13,6 +13,7 @@ import companyRouter from './company/company.routes.js';
 import applicationRouter from './application/application.routes.js';
 import interviewRouter from './interview/interview.routes.js';
 import fileRouter from './file/file.routes.js';
+import dashboardRouter from './dashboard/dashboard.routes.js';
 
 
 export function createApplication():Express{
@@ -44,6 +45,7 @@ export function createApplication():Express{
    app.use("/applications" ,applicationRouter)
    app.use("/interviews", interviewRouter);
    app.use("/files", fileRouter);
+   app.use("/dashboard", dashboardRouter);
 
 
     app.get("/health", async (req, res) => {
