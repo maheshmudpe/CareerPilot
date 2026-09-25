@@ -5,8 +5,8 @@ import Login from "../app/auth/pages/Login";
 import Register from "../app/auth/pages/Register";
 import DashboardPage from "../app/dashboard/pages/DashboardPage";
 
-import Applications from "../pages/Applications";
-import ApplicationDetails from "../pages/ApplicationDetails";
+import ApplicationsPage from "@/app/application/pages/ApplicationsPage";
+import ApplicationDetailsPage from "@/app/application/pages/ApplicationDetailsPage";
 import CompaniesPage from "@/app/company/Pages/CompaniesPage";
 import Interviews from "../pages/Interviews";
 import ProfilePage from "@/app/profile/Pages/ProfilePage";
@@ -28,10 +28,10 @@ export function AppRoutes() {
           <Route path="/" element={<DashboardPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
 
-          <Route path="/applications" element={<Applications />} />
+          <Route path="/applications" element={<ApplicationsPage />} />
           <Route
             path="/applications/:id"
-            element={<ApplicationDetails />}
+            element={<ApplicationDetailsPage />}
           />
           <Route path="/companies" element={<CompaniesPage />} />
           <Route
