@@ -1,22 +1,64 @@
-# Dependencies
+# ==========================================
+# Dependencies & Package Managers
+# ==========================================
 node_modules/
+.pnpm-store/
+.yarn/
+package-lock.json.log
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Build outputs
+# ==========================================
+# Build & Output Directories
+# ==========================================
 dist/
 build/
+out/
+.next/
+.turbo/
+.cache/
 
-# Environment variables
+# ==========================================
+# Environment & Secret Files
+# ==========================================
 .env
 .env.*
 !.env.example
+*.pem
 
-# Logs and coverage
+# ==========================================
+# Runtime, Logs & Testing
+# ==========================================
 *.log
+logs/
 coverage/
+.nyc_output/
+playwright-report/
+test-results/
 
-# System / IDE files
-.DS_Store
-.vscode/
-
-
+# ==========================================
+# Backend & Media Uploads
+# ==========================================
 backend/uploads/
+uploads/
+!backend/uploads/.gitkeep
+
+# ==========================================
+# System & Editor Files
+# ==========================================
+.DS_Store
+.DS_Store?
+ehthumbs.db
+Thumbs.db
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

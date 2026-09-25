@@ -5,6 +5,7 @@ import { uploadFileSchema } from "./file.schema.js";
 import {
     createFileService,
     validateUploadedFile,
+    getFilesService
 } from "./file.service.js";
 
 export const uploadFileController = async (
@@ -50,5 +51,19 @@ export const uploadFileController = async (
     return res.status(201).json({
         message: "File uploaded successfully",
         file: createdFile,
+    });
+};
+
+
+export const getFilesController = async (
+    req: Request,
+    res: Response
+) => {
+    const userId = req.user!.id;
+
+    const files = await getFilesService(userId);
+
+    return res.status(200).json({
+        files,
     });
 };

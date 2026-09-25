@@ -220,3 +220,13 @@ export const createFileService = async (
         throw error;
     }
 };
+
+
+export const getFilesService = async (userId: string) => {
+    const files = await db
+        .select()
+        .from(filesTable)
+        .where(eq(filesTable.userId, userId));
+
+    return files;
+};

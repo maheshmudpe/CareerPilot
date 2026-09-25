@@ -9,8 +9,7 @@ import Applications from "../pages/Applications";
 import ApplicationDetails from "../pages/ApplicationDetails";
 import Companies from "../pages/Companies";
 import Interviews from "../pages/Interviews";
-import Profile from "../pages/Profile";
-
+import ProfilePage from "@/app/profile/Pages/ProfilePage";
 import ProtectedRoute from "../app/auth/ProtectedRoute";
 
 export function AppRoutes() {
@@ -33,7 +32,7 @@ export function AppRoutes() {
           />
           <Route path="/companies" element={<Companies />} />
           <Route path="/interviews" element={<Interviews />} />
-          <Route path="/profile" element={<Profile />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Route>
       </Route>
     </Routes>
