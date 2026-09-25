@@ -7,10 +7,13 @@ import DashboardPage from "../app/dashboard/pages/DashboardPage";
 
 import Applications from "../pages/Applications";
 import ApplicationDetails from "../pages/ApplicationDetails";
-import Companies from "../pages/Companies";
+import CompaniesPage from "@/app/company/Pages/CompaniesPage";
 import Interviews from "../pages/Interviews";
 import ProfilePage from "@/app/profile/Pages/ProfilePage";
 import ProtectedRoute from "../app/auth/ProtectedRoute";
+
+import CompanyDetailsPage from "@/app/company/Pages/CompanyDetailsPage";
+
 
 export function AppRoutes() {
   return (
@@ -30,7 +33,11 @@ export function AppRoutes() {
             path="/applications/:id"
             element={<ApplicationDetails />}
           />
-          <Route path="/companies" element={<Companies />} />
+          <Route path="/companies" element={<CompaniesPage />} />
+          <Route
+                path="/companies/:id"
+                element={<CompanyDetailsPage />}
+              />
           <Route path="/interviews" element={<Interviews />} />
           <Route path="/profile" element={<ProfilePage />} />
         </Route>
