@@ -8,7 +8,8 @@ import DashboardPage from "../app/dashboard/pages/DashboardPage";
 import ApplicationsPage from "@/app/application/pages/ApplicationsPage";
 import ApplicationDetailsPage from "@/app/application/pages/ApplicationDetailsPage";
 import CompaniesPage from "@/app/company/Pages/CompaniesPage";
-import Interviews from "../pages/Interviews";
+import InterviewsPage from "@/app/interview/pages/InterviewsPage";
+import InterviewDetailsPage from "@/app/interview/pages/InterviewDetailsPage";
 import ProfilePage from "@/app/profile/Pages/ProfilePage";
 import ProtectedRoute from "../app/auth/ProtectedRoute";
 
@@ -38,7 +39,11 @@ export function AppRoutes() {
                 path="/companies/:id"
                 element={<CompanyDetailsPage />}
               />
-          <Route path="/interviews" element={<Interviews />} />
+          <Route path="/interviews" element={<InterviewsPage />} />
+          <Route
+                path="/interviews/:id"
+                element={<InterviewDetailsPage />}
+              />
           <Route path="/profile" element={<ProfilePage />} />
         </Route>
       </Route>
