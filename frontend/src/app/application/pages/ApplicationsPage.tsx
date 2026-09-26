@@ -39,36 +39,65 @@ const ApplicationsPage = () => {
   const [search, setSearch] =
     useState("");
 
+  const [status, setStatus] = useState("");
+  const [companyId, setCompanyId] = useState("");
+
   const [isAddDialogOpen, setIsAddDialogOpen] =
     useState(false);
 
   const [isInitialLoading, setIsInitialLoading] =
     useState(true);
 
+  const [isQueryLoading, setIsQueryLoading] = useState(false);
+
   const [error, setError] =
     useState<string | null>(null);
 
+
+  const [sortBy, setSortBy] = useState<
+    "createdAt" | "updatedAt" | "appliedAt" | "jobTitle"
+  >("createdAt");
+
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalApplications, setTotalApplications] = useState(0);
+
   const loadApplications = async (
-    searchTerm = ""
+    searchTerm = "",
+    statusFilter = "",
+    companyFilter = "",
+    sortField: "createdAt" | "updatedAt" | "appliedAt" | "jobTitle" = "createdAt",
+    order: "asc" | "desc" = "desc",
+    pageNumber = 1
   ) => {
-    try {
-      setError(null);
+   try {
+  setError(null);
+  setIsQueryLoading(true);
 
       const result = await getApplications({
         search: searchTerm || undefined,
+        status: statusFilter || undefined,
+        companyId: companyFilter || undefined,
+        sortBy: sortField,
+        sortOrder: order,
+        page: pageNumber,
+        limit: 10,
       });
 
-      setApplications(result.applications);
-    } catch (error) {
-      console.error(
-        "Failed to load applications:",
-        error
-      );
 
-      setError(
-        "Unable to load applications."
-      );
+      setApplications(result.applications);
+      setTotalPages(result.pagination.totalPages);
+      setTotalApplications(result.pagination.total);
+    } catch (error) {
+      console.error("Failed to load applications:", error);
+      setError("Unable to load applications.");
     }
+
+    finally {
+  setIsQueryLoading(false);
+}
   };
 
   const handleApplicationCreated = (
@@ -123,8 +152,29 @@ const ApplicationsPage = () => {
   useEffect(() => {
     if (isInitialLoading) return;
 
-    loadApplications(search);
-  }, [search, isInitialLoading]);
+    loadApplications(
+      search,
+      status,
+      companyId,
+      sortBy,
+      sortOrder,
+      page
+    );
+  }, [
+    search,
+    status,
+    companyId,
+    sortBy,
+    sortOrder,
+    page,
+    isInitialLoading,
+  ]);
+
+
+  useEffect(() => {
+    setPage(1);
+  }, [search, status, companyId, sortBy, sortOrder]);
+
 
   if (isInitialLoading) {
     return (
@@ -189,22 +239,122 @@ const ApplicationsPage = () => {
       </Dialog>
 
       {/* Search */}
-      <div className="max-w-md">
+      <div className="grid gap-4 md:grid-cols-3">
         <Input
           type="search"
           placeholder="Search applications..."
           value={search}
-          onChange={(event) =>
-            setSearch(event.target.value)
-          }
+          onChange={(event) => setSearch(event.target.value)}
         />
+
+        <select
+          value={status}
+          onChange={(event) => setStatus(event.target.value)}
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+        >
+          <option value="">All statuses</option>
+          <option value="SAVED">Saved</option>
+          <option value="APPLIED">Applied</option>
+          <option value="SCREENING">Screening</option>
+          <option value="INTERVIEW">Interview</option>
+          <option value="OFFER">Offer</option>
+          <option value="ACCEPTED">Accepted</option>
+          <option value="REJECTED">Rejected</option>
+          <option value="WITHDRAWN">Withdrawn</option>
+        </select>
+
+        <select
+          value={companyId}
+          onChange={(event) => setCompanyId(event.target.value)}
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+        >
+          <option value="">All companies</option>
+
+          {companies.map((company) => (
+            <option key={company.id} value={company.id}>
+              {company.name}
+            </option>
+          ))}
+        </select>
+
+
+        <select
+          value={sortBy}
+          onChange={(event) =>
+            setSortBy(
+              event.target.value as
+              | "createdAt"
+              | "updatedAt"
+              | "appliedAt"
+              | "jobTitle"
+            )
+          }
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+        >
+          <option value="createdAt">Created Date</option>
+          <option value="updatedAt">Last Updated</option>
+          <option value="appliedAt">Applied Date</option>
+          <option value="jobTitle">Job Title</option>
+        </select>
+
+        <select
+          value={sortOrder}
+          onChange={(event) =>
+            setSortOrder(
+              event.target.value as "asc" | "desc"
+            )
+          }
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+        >
+          <option value="desc">Newest first</option>
+          <option value="asc">Oldest first</option>
+        </select>
       </div>
 
+      {isQueryLoading && (
+        <p className="text-sm text-muted-foreground">
+          Updating applications...
+        </p>
+      )}
+
       {/* Application List */}
-      <ApplicationList
+     <ApplicationList
         applications={applications}
         companies={companies}
+        hasActiveFilters={
+          Boolean(search) ||
+          Boolean(status) ||
+          Boolean(companyId)
+        }
       />
+
+      <div className="flex items-center justify-between gap-4 border-t pt-6">
+        <p className="text-sm text-muted-foreground">
+          {totalApplications === 0
+            ? "No applications"
+            : `Showing page ${page} of ${totalPages} · ${totalApplications} applications`}
+        </p>
+
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            disabled={page === 1}
+            onClick={() => setPage((current) => current - 1)}
+          >
+            Previous
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            disabled={page === totalPages}
+            onClick={() => setPage((current) => current + 1)}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };

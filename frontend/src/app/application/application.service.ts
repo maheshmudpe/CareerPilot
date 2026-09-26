@@ -16,6 +16,8 @@ interface GetApplicationsParams {
   companyId?: string;
   page?: number;
   limit?: number;
+  sortBy?: "createdAt" | "updatedAt" | "appliedAt" | "jobTitle";
+  sortOrder?: "asc" | "desc";
 }
 
 export const getApplications = async (
