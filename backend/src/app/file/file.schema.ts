@@ -37,3 +37,11 @@ export type UploadFilePayload = z.infer<
 >;
 
 export type FileResponse = z.infer<typeof fileSchema>;
+
+export const fileIdSchema = z.object({
+    id: z.uuid(),
+});
+
+export type FileIdParams = z.infer<
+    typeof fileIdSchema
+>;

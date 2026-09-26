@@ -1,11 +1,14 @@
 import type { Request, Response } from "express";
 import fs from "node:fs/promises";
 
-import { uploadFileSchema } from "./file.schema.js";
+import { uploadFileSchema, fileIdSchema } from "./file.schema.js";
 import {
     createFileService,
     validateUploadedFile,
-    getFilesService
+    getFilesService,
+    deleteFileService,
+    getFileUrlService,
+
 } from "./file.service.js";
 
 export const uploadFileController = async (
@@ -65,5 +68,48 @@ export const getFilesController = async (
 
     return res.status(200).json({
         files,
+    });
+};
+
+
+export const deleteFileController = async (
+    req: Request,
+    res: Response
+) => {
+
+    const userId = req.user!.id;
+
+    const { id } = fileIdSchema.parse(
+        req.params
+    );
+
+    await deleteFileService(
+        userId,
+        id
+    );
+
+    return res.status(200).json({
+        message: "File deleted successfully",
+    });
+};
+
+
+export const getFileUrlController = async (
+    req: Request,
+    res: Response
+) => {
+    const userId = req.user!.id;
+
+    const { id } = fileIdSchema.parse(
+        req.params
+    );
+
+    const signedUrl = await getFileUrlService(
+        userId,
+        id
+    );
+
+    return res.status(200).json({
+        url: signedUrl,
     });
 };

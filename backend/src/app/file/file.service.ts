@@ -230,3 +230,87 @@ export const getFilesService = async (userId: string) => {
 
     return files;
 };
+
+
+
+export const deleteFileService = async (
+    userId: string,
+    fileId: string
+) => {
+
+    const [file] = await db
+        .select()
+        .from(filesTable)
+        .where(
+            and(
+                eq(filesTable.id, fileId),
+                eq(filesTable.userId, userId)
+            )
+        );
+
+    if (!file) {
+        throw new NotFoundError(
+            "File not found"
+        );
+    }
+
+    /*
+     * 1. Delete file from Supabase Storage
+     */
+
+    await supabase.storage
+        .from(env.SUPABASE_BUCKET)
+        .remove([file.storageKey]);
+
+    /*
+     * 2. Delete file metadata from PostgreSQL
+     */
+
+    await db
+        .delete(filesTable)
+        .where(
+            and(
+                eq(filesTable.id, fileId),
+                eq(filesTable.userId, userId)
+            )
+        );
+
+    return file;
+};
+
+export const getFileUrlService = async (
+    userId: string,
+    fileId: string
+) => {
+    const [file] = await db
+        .select()
+        .from(filesTable)
+        .where(
+            and(
+                eq(filesTable.id, fileId),
+                eq(filesTable.userId, userId)
+            )
+        );
+
+    if (!file) {
+        throw new NotFoundError(
+            "File not found"
+        );
+    }
+
+    const { data, error } =
+        await supabase.storage
+            .from(env.SUPABASE_BUCKET)
+            .createSignedUrl(
+                file.storageKey,
+                60 * 5
+            );
+
+    if (error || !data?.signedUrl) {
+        throw new Error(
+            "Unable to generate file URL"
+        );
+    }
+
+    return data.signedUrl;
+};
