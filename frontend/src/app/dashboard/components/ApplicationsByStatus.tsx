@@ -54,7 +54,7 @@ const ApplicationsByStatus = ({
 
       <CardContent>
         {totalApplications === 0 ? (
-          <div className="flex h-[240px] flex-col items-center justify-center text-center">
+          <div className="flex h-60 flex-col items-center justify-center text-center">
             <p className="text-sm font-medium">
               No applications yet
             </p>
@@ -65,7 +65,7 @@ const ApplicationsByStatus = ({
             </p>
           </div>
         ) : (
-          <div className="h-[240px] w-full">
+          <div className="h-60 w-full">
             <ResponsiveContainer
               width="100%"
               height="100%"
@@ -75,17 +75,24 @@ const ApplicationsByStatus = ({
                 margin={{
                   top: 10,
                   right: 10,
-                  left: -20,
-                  bottom: 10,
+                  left: 5,
+                  bottom: 20,
                 }}
               >
-                <CartesianGrid vertical={false} />
+                <CartesianGrid
+                  vertical={false}
+                  stroke="var(--border)"
+                />
 
                 <XAxis
                   dataKey="status"
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 11 }}
+                  angle={-25}
+                  textAnchor="end"
+                  height={50}
+                  interval={0}
                 />
 
                 <YAxis
@@ -94,13 +101,17 @@ const ApplicationsByStatus = ({
                   tickCount={Math.min(maxCount + 1, 5)}
                   tickLine={false}
                   axisLine={false}
-                  width={30}
+                  width={35}
                 />
 
-                <Tooltip />
+                <Tooltip
+                  cursor={{ fill: "var(--muted)" }}
+                  formatter={(value) => [value, "Applications"]}
+                />
 
                 <Bar
                   dataKey="count"
+                  fill="var(--primary)"
                   radius={[4, 4, 0, 0]}
                 />
               </BarChart>

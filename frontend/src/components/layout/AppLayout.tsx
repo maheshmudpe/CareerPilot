@@ -12,7 +12,7 @@ function AppLayout() {
           onClose={() => setSidebarOpen(false)}
         />
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col md:ml-64">
         <Header onMenuClick={() => setSidebarOpen(true)} />
 
         <main className="flex-1 p-6">
