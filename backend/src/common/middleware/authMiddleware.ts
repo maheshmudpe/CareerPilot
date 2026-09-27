@@ -31,7 +31,9 @@ export const authMiddleware = (
     }
 
         try {
-            const decoded = jwt.verify(token, env.JWT_SECRET);
+            const decoded = jwt.verify(token, env.JWT_SECRET ,  {
+                algorithms: ["HS256"],
+            });
 
             if (typeof decoded === "string") {
                 throw new UnauthorizedError("Invalid authentication token");

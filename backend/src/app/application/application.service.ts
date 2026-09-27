@@ -168,6 +168,26 @@ export const updateApplicationService = async (
     applicationId: string,
     payload: UpdateApplicationPayload
 ) => {
+
+    // 1. If companyId is being changed,
+    //    make sure the company belongs to this user.
+    if (payload.companyId) {
+        const [company] = await db
+            .select({ id: companiesTable.id })
+            .from(companiesTable)
+            .where(
+                and(
+                    eq(companiesTable.id, payload.companyId),
+                    eq(companiesTable.userId, userId)
+                )
+            );
+
+        if (!company) {
+            throw new NotFoundError("Company not found");
+        }
+    }
+
+    // 2. Update only the application owned by this user.
     const [application] = await db
         .update(applicationsTable)
         .set({
@@ -182,15 +202,14 @@ export const updateApplicationService = async (
         )
         .returning();
 
+    // 3. If no application was updated,
+    //    either it doesn't exist or doesn't belong to this user.
     if (!application) {
-        throw new NotFoundError(
-            "Application not found"
-        );
+        throw new NotFoundError("Application not found");
     }
 
     return application;
 };
-
 
 
 export const deleteApplicationService = async (

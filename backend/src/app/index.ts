@@ -5,6 +5,8 @@ import { sql } from "drizzle-orm";
 import { db } from '../db/index.js';
 
 import cors from "cors";
+import rateLimit from "express-rate-limit";
+import helmet from "helmet";
 
 import authRouter from './auth/auth.routes.js';
 import { errorHandler } from '../common/errors/ErrorHandler.js';
@@ -19,12 +21,23 @@ import dashboardRouter from './dashboard/dashboard.routes.js';
 export function createApplication():Express{
 
     const app = express()
+    app.use(helmet());
+
+    //rate-limiter
+
+    const authRateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    limit: 10,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    message: {
+        message: "Too many authentication attempts. Please try again later.",
+    },
+});
 
 
     //cors
 
-
-        
     app.use(
     cors({
         origin: "http://localhost:5173",
@@ -39,7 +52,7 @@ export function createApplication():Express{
     
 
     //routes
-   app.use("/auth", authRouter);
+   app.use("/auth", authRateLimiter, authRouter);
    app.use('/profile' , profileRouter)
    app.use("/companies" , companyRouter)
    app.use("/applications" ,applicationRouter)
