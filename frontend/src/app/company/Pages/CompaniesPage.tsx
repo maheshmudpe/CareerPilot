@@ -34,46 +34,46 @@ const CompaniesPage = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] =
     useState(false);
 
-const loadCompanies = async (searchTerm = "") => {
-  try {
-    setError(null);
-
-    const result = await getCompanies({
-      search: searchTerm || undefined,
-    });
-
-    setCompanies(result.companies);
-  } catch (error) {
-    console.error("Failed to load companies:", error);
-    setError("Unable to load companies.");
-  }
-};
-
-useEffect(() => {
-  const loadInitialCompanies = async () => {
+  const loadCompanies = async (searchTerm = "") => {
     try {
-      setIsInitialLoading(true);
       setError(null);
 
-      const result = await getCompanies();
+      const result = await getCompanies({
+        search: searchTerm || undefined,
+      });
 
       setCompanies(result.companies);
     } catch (error) {
       console.error("Failed to load companies:", error);
       setError("Unable to load companies.");
-    } finally {
-      setIsInitialLoading(false);
     }
   };
 
-  loadInitialCompanies();
-}, []);
+  useEffect(() => {
+    const loadInitialCompanies = async () => {
+      try {
+        setIsInitialLoading(true);
+        setError(null);
 
-useEffect(() => {
-  if (isInitialLoading) return;
+        const result = await getCompanies();
 
-  loadCompanies(search);
-}, [search, isInitialLoading]);
+        setCompanies(result.companies);
+      } catch (error) {
+        console.error("Failed to load companies:", error);
+        setError("Unable to load companies.");
+      } finally {
+        setIsInitialLoading(false);
+      }
+    };
+
+    loadInitialCompanies();
+  }, []);
+
+  useEffect(() => {
+    if (isInitialLoading) return;
+
+    loadCompanies(search);
+  }, [search, isInitialLoading]);
 
   const handleCompanyCreated = (company: Company) => {
     setCompanies((current) => [company, ...current]);
@@ -134,11 +134,13 @@ useEffect(() => {
           open={isAddDialogOpen}
           onOpenChange={setIsAddDialogOpen}
         >
-          <DialogTrigger>
-            <Button type="button">
-              + Add Company
-            </Button>
-          </DialogTrigger>
+          <DialogTrigger
+            render={
+              <Button type="button">
+                + Add Company
+              </Button>
+            }
+          />
 
           <DialogContent className="sm:max-w-2xl">
             <DialogHeader>
@@ -155,13 +157,13 @@ useEffect(() => {
       </div>
 
       <div className="max-w-md">
-      <Input
-        type="search"
-        placeholder="Search companies..."
-        value={search}
-        onChange={(event) => setSearch(event.target.value)}
-      />
-     </div>
+        <Input
+          type="search"
+          placeholder="Search companies..."
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+        />
+      </div>
 
       {/* Company List */}
       <CompanyList

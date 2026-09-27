@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BriefcaseBusiness } from "lucide-react";
+
 
 import DashboardStats from "../components/DashboardStats";
 import UpcomingInterviews from "../components/UpcomingInterviews";
@@ -40,20 +40,14 @@ const DashboardPage = () => {
   return (
     <div className="space-y-8">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Dashboard
-          </h1>
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">
+          Dashboard
+        </h1>
 
-          <p className="mt-1 text-sm text-muted-foreground">
-            Track your applications, interviews, and job search progress.
-          </p>
-        </div>
-
-        <div className="hidden rounded-lg border bg-card p-2 sm:block">
-          <BriefcaseBusiness className="h-5 w-5 text-muted-foreground" />
-        </div>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Track your applications, interviews, and job search progress.
+        </p>
       </div>
 
       {/* Loading */}
@@ -77,23 +71,23 @@ const DashboardPage = () => {
             statistics={dashboard.statistics}
           />
 
-        <div className="grid items-start gap-6 lg:grid-cols-2">
+          <div className="grid items-start gap-6 lg:grid-cols-2">
             <ApplicationsByStatus
-                applicationsByStatus={dashboard.applicationsByStatus}
+              applicationsByStatus={dashboard.applicationsByStatus}
             />
 
             <UpcomingInterviews
-                interviews={dashboard.upcomingInterviews}
+              interviews={dashboard.upcomingInterviews}
             />
-        </div>
+          </div>
 
-            <RecentApplications
+          <RecentApplications
             applications={dashboard.recentApplications}
-            />
+          />
         </>
       )}
 
-    
+
     </div>
   );
 };

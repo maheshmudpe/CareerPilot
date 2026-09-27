@@ -1,11 +1,18 @@
-import { Bell, LogOut, Search } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
 import { useNavigate } from "react-router";
 
 import { useAuth } from "@/app/auth/AuthContext";
+import { useState } from "react";
 
-function Header() {
+
+interface HeaderProps {
+  onMenuClick: () => void;
+}
+
+function Header({ onMenuClick }: HeaderProps) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -13,47 +20,68 @@ function Header() {
   };
 
   return (
-    <header className="flex h-16 items-center justify-between border-b bg-background px-6">
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Search className="h-4 w-4" />
-        <span>Search applications...</span>
-      </div>
+   <header className="flex h-16 items-center justify-between border-b bg-background px-6 md:justify-end">
+      <button
+        type="button"
+        onClick={onMenuClick}
+        className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:hidden"
+        aria-label="Open navigation"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
 
-      <div className="flex items-center gap-4">
+      <div className="relative">
         <button
           type="button"
-          className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          aria-label="Notifications"
+          onClick={() => setUserMenuOpen((open) => !open)}
+          className="flex items-center gap-3 rounded-md p-1.5 transition-colors hover:bg-muted"
+          aria-expanded={userMenuOpen}
+          aria-haspopup="menu"
         >
-          <Bell className="h-5 w-5" />
-        </button>
-
-        <div className="flex items-center gap-3">
           <div className="hidden text-right sm:block">
             <p className="text-sm font-medium">
-              {user?.email}
+              {user?.email?.split("@")[0]}
             </p>
             <p className="text-xs text-muted-foreground">
-              CareerPilot user
+              CareerPilot
             </p>
           </div>
 
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-medium">
             {user?.email?.charAt(0).toUpperCase()}
           </div>
+        </button>
 
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-            aria-label="Log out"
-            title="Log out"
+        {userMenuOpen && (
+          <div
+            className="absolute right-0 top-full z-50 mt-2 w-48 rounded-md border bg-background p-1 shadow-md"
+            role="menu"
           >
-            <LogOut className="h-4 w-4" />
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={() => {
+                setUserMenuOpen(false);
+                navigate("/profile");
+              }}
+              className="flex w-full items-center rounded-sm px-3 py-2 text-sm hover:bg-muted"
+              role="menuitem"
+            >
+              Profile
+            </button>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex w-full items-center rounded-sm px-3 py-2 text-sm text-destructive hover:bg-muted"
+              role="menuitem"
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Log out
+            </button>
+          </div>
+        )}
       </div>
-    </header>
+    </header >
   );
 }
 

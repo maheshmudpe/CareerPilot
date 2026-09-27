@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/card";
 
 interface ProfileFormProps {
-  profile: Profile;
+  profile: Profile | null;
   onUpdated: (profile: Profile) => void;
 }
 
@@ -41,26 +41,26 @@ const ProfileForm = ({
     resolver: zodResolver(updateProfileSchema),
     mode: "onSubmit",
     reValidateMode: "onChange",
-    defaultValues: {
-      fullName: profile.fullName,
-      phone: profile.phone ?? "",
-      location: profile.location ?? "",
-      bio: profile.bio ?? "",
-      linkedinUrl: profile.linkedinUrl ?? "",
-      githubUrl: profile.githubUrl ?? "",
-    },
+   defaultValues: {
+  fullName: profile?.fullName ?? "",
+  phone: profile?.phone ?? "",
+  location: profile?.location ?? "",
+  bio: profile?.bio ?? "",
+  linkedinUrl: profile?.linkedinUrl ?? "",
+  githubUrl: profile?.githubUrl ?? "",
+},
   });
 
-  useEffect(() => {
-    reset({
-      fullName: profile.fullName,
-      phone: profile.phone ?? "",
-      location: profile.location ?? "",
-      bio: profile.bio ?? "",
-      linkedinUrl: profile.linkedinUrl ?? "",
-      githubUrl: profile.githubUrl ?? "",
-    });
-  }, [profile, reset]);
+useEffect(() => {
+  reset({
+    fullName: profile?.fullName ?? "",
+    phone: profile?.phone ?? "",
+    location: profile?.location ?? "",
+    bio: profile?.bio ?? "",
+    linkedinUrl: profile?.linkedinUrl ?? "",
+    githubUrl: profile?.githubUrl ?? "",
+  });
+}, [profile, reset]);
 
   const onSubmit = async (
     data: UpdateProfilePayload,

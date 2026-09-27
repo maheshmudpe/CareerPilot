@@ -253,10 +253,24 @@ const InterviewsPage = () => {
 
       {/* Interview List */}
 
-      <InterviewList
-        interviews={interviews}
-        applications={applications}
-      />
+      {/* All Interviews */}
+
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-lg font-semibold">
+            All Interviews
+          </h2>
+
+          <p className="mt-1 text-sm text-muted-foreground">
+            View and manage all your interviews.
+          </p>
+        </div>
+
+        <InterviewList
+          interviews={interviews}
+          applications={applications}
+        />
+      </section>
 
     </div>
   );

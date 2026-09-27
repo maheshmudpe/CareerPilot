@@ -4,7 +4,7 @@ import ProfileForm from "../components/ProfileForm";
 import SkillsSection from "../components/SkillsSection";
 import { getProfile } from "../profile.service";
 import type { Profile } from "../profile.schema";
-
+import axios from "axios";
 import ResumeSection from "../components/ResumeSection";
 
 const ProfilePage = () => {
@@ -24,8 +24,12 @@ const ProfilePage = () => {
 
         setProfile(data);
       } catch (error) {
-        console.error("Failed to load profile:", error);
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+          setProfile(null);
+          return;
+        }
 
+        console.error("Failed to load profile:", error);
         setError("Unable to load profile.");
       } finally {
         setIsLoading(false);
@@ -51,9 +55,7 @@ const ProfilePage = () => {
     );
   }
 
-  if (!profile) {
-    return null;
-  }
+
 
   return (
     <div className="space-y-8">
