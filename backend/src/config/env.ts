@@ -11,11 +11,15 @@ const envSchema = z.object({
 
     PORT: z.coerce.number().int().positive(),
 
+    FRONTEND_URL: z.string().url(),
+
     SUPABASE_URL: z.string().url(),
 
     SUPABASE_SECRET_KEY: z.string().min(1),
 
     SUPABASE_BUCKET: z.string().min(1),
+
+    
 });
 
 export const env = envSchema.parse(process.env);

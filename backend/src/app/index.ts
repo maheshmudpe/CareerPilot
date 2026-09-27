@@ -16,6 +16,7 @@ import applicationRouter from './application/application.routes.js';
 import interviewRouter from './interview/interview.routes.js';
 import fileRouter from './file/file.routes.js';
 import dashboardRouter from './dashboard/dashboard.routes.js';
+import { env } from '../config/env.js';
 
 
 export function createApplication():Express{
@@ -38,11 +39,11 @@ export function createApplication():Express{
 
     //cors
 
-    app.use(
+  app.use(
     cors({
-        origin: "http://localhost:5173",
+        origin: env.FRONTEND_URL,
     }),
-    );
+);
 
 
     //middlewars
